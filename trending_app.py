@@ -1,77 +1,132 @@
 import streamlit as st
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
 
 
 def main():
-    st.title("Multi-functional Application")
+    with open('config.yaml') as file:
+        config = yaml.load(file, Loader=SafeLoader)
 
-    tab1, tab2 = st.tabs(
-        ["Create Script/Video/Audio", "Create Video by Motion"])
+    # Initialize authenticator
+    authenticator = stauth.Authenticate(
+        config['credentials'],
+        config['cookie']['name'],
+        config['cookie']['key'],
+        config['cookie']['expiry_days'],
+        config['preauthorized']
+    )
 
-    with tab1:
-        st.header("Create Script, Video, and Audio")
+    # Create a login widget
+    name, authentication_status, username = authenticator.login(
+        'Login', 'main')
 
-        if 'script' not in st.session_state:
-            script_text = st.text_area("Enter text to generate script", "")
-            if st.button("Generate Script"):
-                st.session_state['script'] = "Generated script from: " + script_text
-                st.experimental_rerun()
+    if authentication_status:
+        st.title("TikTokTechJam-CLOCK")
 
-        if 'script' in st.session_state:
-            st.write(st.session_state['script'])
+        tab1, tab2 = st.tabs(
+            ["Create Script/Video/Audio", "Create Video by Motion"])
 
-            if 'video' not in st.session_state:
-                if st.button("Convert Script to Video"):
-                    st.session_state['video'] = "Generated video from script"
+        with tab1:
+            st.header("Create Script, Video, and Audio")
+
+            if 'script' not in st.session_state:
+                script_text = st.text_area("Enter text to generate script", "")
+
+                if st.button("Generate Script"):
+                    st.session_state['script'] = "Generated script from: " + script_text
                     st.experimental_rerun()
-                if st.button("Back to Script Generation"):
-                    del st.session_state['script']
-                    st.experimental_rerun()
 
-            if 'video' in st.session_state:
-                st.write(st.session_state['video'])
+            if 'script' in st.session_state:
+                st.write(st.session_state['script'])
 
-                if 'audio' not in st.session_state:
-                    if st.button("Convert Video to Audio"):
-                        st.session_state['audio'] = "Generated audio from video"
-                        st.experimental_rerun()
-                    if st.button("Back to Video Generation"):
-                        del st.session_state['video']
-                        st.experimental_rerun()
+                if 'video' not in st.session_state and 'audio' not in st.session_state:
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        if st.button("Back to Script Generation"):
+                            del st.session_state['script']
+                            st.experimental_rerun()
+
+                    with col2:
+                        if st.button("Convert Script to Video"):
+                            st.session_state['video'] = "Generated video from script: " + script_text
+                            st.experimental_rerun()
+
+                    with col3:
+                        if st.button("Convert Script to Audio"):
+                            st.session_state['audio'] = "Generated audio from script: " + script_text
+                            st.experimental_rerun()
+
+                if 'video' in st.session_state:
+                    st.write(st.session_state['video'])
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        if st.button("Back to Script Generation"):
+                            del st.session_state['script']
+                            del st.session_state['video']
+                            st.experimental_rerun()
+
+                    with col2:
+                        if st.button("Back to Video or Audio Generation"):
+                            del st.session_state['video']
+                            st.experimental_rerun()
 
                 if 'audio' in st.session_state:
                     st.write(st.session_state['audio'])
-                    if st.button("Back to Video Generation"):
-                        del st.session_state['audio']
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        if st.button("Back to Script Generation"):
+                            del st.session_state['script']
+                            del st.session_state['audio']
+                            st.experimental_rerun()
+
+                    with col2:
+                        if st.button("Back to Video or Audio Generation"):
+                            del st.session_state['audio']
+                            st.experimental_rerun()
+
+        with tab2:
+            st.header("Create Video by Motion")
+
+            if 'motion_video' not in st.session_state:
+                motion_text = st.text_area(
+                    "Enter text to generate motion video", "")
+                motion_video = st.file_uploader(
+                    "Upload video for motion", type=["mp4", "mov", "avi"])
+                if st.button("Generate Motion Video"):
+                    st.session_state['motion_video'] = "Generated motion video from: " + motion_text
+                    st.experimental_rerun()
+
+            if 'motion_video' in st.session_state:
+                st.write(st.session_state['motion_video'])
+
+                if 'motion_audio_video' not in st.session_state:
+                    if st.button("Add Audio to Motion Video"):
+                        st.session_state['motion_audio_video'] = "Generated motion video with audio"
+                        st.experimental_rerun()
+                    if st.button("Back to Motion Video Generation"):
+                        del st.session_state['motion_video']
                         st.experimental_rerun()
 
-    with tab2:
-        st.header("Create Video by Motion")
+                if 'motion_audio_video' in st.session_state:
+                    st.write(st.session_state['motion_audio_video'])
+                    if st.button("Back to Motion Video Generation"):
+                        del st.session_state['motion_audio_video']
+                        st.experimental_rerun()
 
-        if 'motion_video' not in st.session_state:
-            motion_text = st.text_area(
-                "Enter text to generate motion video", "")
-            motion_video = st.file_uploader(
-                "Upload video for motion", type=["mp4", "mov", "avi"])
-            if st.button("Generate Motion Video"):
-                st.session_state['motion_video'] = "Generated motion video from: " + motion_text
-                st.experimental_rerun()
+    elif authentication_status == False:
+        st.error('Username/password is incorrect')
+    elif authentication_status == None:
+        st.warning('Please enter your username and password')
 
-        if 'motion_video' in st.session_state:
-            st.write(st.session_state['motion_video'])
+    # Optional: Add register and forgot password buttons
+    if st.sidebar.button('Register'):
+        authenticator.register_user('Register user', preauthorization=False)
 
-            if 'motion_audio_video' not in st.session_state:
-                if st.button("Add Audio to Motion Video"):
-                    st.session_state['motion_audio_video'] = "Generated motion video with audio"
-                    st.experimental_rerun()
-                if st.button("Back to Motion Video Generation"):
-                    del st.session_state['motion_video']
-                    st.experimental_rerun()
-
-            if 'motion_audio_video' in st.session_state:
-                st.write(st.session_state['motion_audio_video'])
-                if st.button("Back to Motion Video Generation"):
-                    del st.session_state['motion_audio_video']
-                    st.experimental_rerun()
+    if st.sidebar.button('Forgot password'):
+        authenticator.forgot_password('Reset password')
 
 
 if __name__ == "__main__":
