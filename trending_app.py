@@ -5,7 +5,7 @@ from yaml.loader import SafeLoader
 
 
 def main():
-    with open('config.yaml') as file:
+    with open('./config.yaml') as file:
         config = yaml.load(file, Loader=SafeLoader)
 
     # Initialize authenticator
@@ -18,43 +18,43 @@ def main():
     )
 
     # Create a login widget
-    name, authentication_status, username = authenticator.login(
-        'Login', 'main')
+    name, authentication_status, username = authenticator.login()
 
     if authentication_status:
         st.title("TikTokTechJam-CLOCK")
 
-        tab1, tab2 = st.tabs(
-            ["Create Script/Video/Audio", "Create Video by Motion"])
+        tab1, tab2, tab3 = st.tabs(
+            ["Create Content/Video/Audio", "Create Video by Motion", "Create Script"])
 
         with tab1:
-            st.header("Create Script, Video, and Audio")
+            st.header("Create Content, Video, and Audio")
 
-            if 'script' not in st.session_state:
-                script_text = st.text_area("Enter text to generate script", "")
+            if 'content' not in st.session_state:
+                content_text = st.text_area(
+                    "Enter text to generate content", key='generate content')
 
-                if st.button("Generate Script"):
-                    st.session_state['script'] = "Generated script from: " + script_text
+                if st.button("Generate Content"):
+                    st.session_state['content'] = "Generated content from: " + content_text
                     st.experimental_rerun()
 
-            if 'script' in st.session_state:
-                st.write(st.session_state['script'])
+            if 'content' in st.session_state:
+                st.write(st.session_state['content'])
 
                 if 'video' not in st.session_state and 'audio' not in st.session_state:
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        if st.button("Back to Script Generation"):
-                            del st.session_state['script']
+                        if st.button("Back to Content Generation"):
+                            del st.session_state['content']
                             st.experimental_rerun()
 
                     with col2:
-                        if st.button("Convert Script to Video"):
-                            st.session_state['video'] = "Generated video from script: " + script_text
+                        if st.button("Convert Content to Video"):
+                            st.session_state['video'] = "Generated video from content:"
                             st.experimental_rerun()
 
                     with col3:
-                        if st.button("Convert Script to Audio"):
-                            st.session_state['audio'] = "Generated audio from script: " + script_text
+                        if st.button("Convert Content to Audio"):
+                            st.session_state['audio'] = "Generated audio from content: "
                             st.experimental_rerun()
 
                 if 'video' in st.session_state:
@@ -62,8 +62,8 @@ def main():
                     col1, col2 = st.columns(2)
 
                     with col1:
-                        if st.button("Back to Script Generation"):
-                            del st.session_state['script']
+                        if st.button("Back to Content Generation"):
+                            del st.session_state['content']
                             del st.session_state['video']
                             st.experimental_rerun()
 
@@ -77,8 +77,8 @@ def main():
                     col1, col2 = st.columns(2)
 
                     with col1:
-                        if st.button("Back to Script Generation"):
-                            del st.session_state['script']
+                        if st.button("Back to Content Generation"):
+                            del st.session_state['content']
                             del st.session_state['audio']
                             st.experimental_rerun()
 
@@ -115,6 +115,24 @@ def main():
                     if st.button("Back to Motion Video Generation"):
                         del st.session_state['motion_audio_video']
                         st.experimental_rerun()
+
+        with tab3:
+            st.header("Generate Script")
+
+            if 'script' not in st.session_state:
+                script_text_2 = st.text_area(
+                    "Enter text to generate script", key='generate script')
+
+                if st.button("Generate Script"):
+                    st.session_state['script'] = "Generated script from: " + \
+                        script_text_2
+                    st.experimental_rerun()
+
+            if 'script' in st.session_state:
+                st.write(st.session_state['script'])
+                if st.button("Back to Script Generation"):
+                    del st.session_state['script']
+                    st.experimental_rerun()
 
     elif authentication_status == False:
         st.error('Username/password is incorrect')
