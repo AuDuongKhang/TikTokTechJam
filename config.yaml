@@ -1,0 +1,17 @@
+cookie:
+  expiry_days: 30
+  key: AT8YNW9uTr6ApPkmB8k5dGx09zSOVmhl
+  name: TikTokTechJam-CLOCK
+credentials:
+  usernames:
+    user1:
+      email: tiktok@techjam.com
+      name: TikTokTechJam
+      password: $2b$12$3Bx5uNPnBSi./vZ8J0jbEuonjjRMp4C.p/ORoOUayhG1LnAUx3xT6
+    user2:
+      email: clock@gmail.com
+      name: CLOCK
+      password: $2b$12$NRhrWzbnibvupZ9qRWQIUO4gHJCU.R.dGyxfV71Koo0L2RDeiVYl6
+preauthorized:
+  emails:
+  - hehe@gmail.com
