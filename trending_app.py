@@ -125,6 +125,7 @@ def main():
 
                     if 'video' not in st.session_state and 'audio' not in st.session_state:
                         col1, col2, col3 = st.columns(3)
+
                         with col1:
                             if st.button("Back to Content Generation"):
                                 del st.session_state['content']
@@ -171,11 +172,6 @@ def main():
 
                     if 'audio' in st.session_state:
                         st.write(st.session_state['audio'])
-                        audio_file_path = 'out.wav'
-                        prompt = st.session_state['content'].split(':')[
-                            1].strip()
-                        gen(audio_file_path, prompt)
-                        st.audio(audio_file_path, format='audio/wav')
                         col1, col2 = st.columns(2)
 
                         with col1:
@@ -198,7 +194,9 @@ def main():
                     motion_video = st.file_uploader(
                         "Upload video for motion", type=["mp4", "mov", "avi"])
                     if motion_video is not None:
-                        st.video(motion_video)  # Display the uploaded video
+                        # Display the uploaded video
+                        st.video(motion_video)
+
                         if st.button("Generate Motion Video"):
                             os.chdir('./FollowYourPose')
                             print(os.getcwd())
