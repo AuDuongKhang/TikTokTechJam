@@ -21,6 +21,8 @@ def main():
     name, authentication_status, username = authenticator.login()
 
     if authentication_status:
+        authenticator.logout()
+
         st.title("TikTokTechJam-CLOCK")
 
         tab1, tab2, tab3 = st.tabs(
