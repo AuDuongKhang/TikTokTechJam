@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
+import text2video as vg  # Import the video generation module
 
 
 def main():
@@ -48,8 +49,14 @@ def main():
                             st.experimental_rerun()
 
                     with col2:
-                        if st.button("Convert Content to Video"):
-                            st.session_state['video'] = "Generated video from content:"
+                        st.subheader("Convert Content to Video")
+                        prompt = st.text_input("Enter prompt for video generation", key='video_prompt')
+                        negative_prompt = st.text_input("Enter negative prompt", key='negative_prompt')
+                        video_duration = st.number_input("Enter video duration (seconds)", min_value=1, max_value=60, value=7)
+
+                        if st.button("Generate Video"):
+                            video_path = vg.generate_video(prompt, negative_prompt, video_duration)
+                            st.session_state['video'] = video_path
                             st.experimental_rerun()
 
                     with col3:
@@ -58,7 +65,9 @@ def main():
                             st.experimental_rerun()
 
                 if 'video' in st.session_state:
-                    st.write(st.session_state['video'])
+                    st.write("Generated video from content:")
+                    video_anime = vg.display_video(st.session_state['video'])
+                    st.write(video_anime.to_html5_video(), unsafe_allow_html=True)
                     col1, col2 = st.columns(2)
 
                     with col1:
