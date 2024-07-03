@@ -21,6 +21,8 @@ def main():
     name, authentication_status, username = authenticator.login()
 
     if authentication_status:
+        authenticator.logout()
+
         st.title("TikTokTechJam-CLOCK")
 
         tab1, tab2, tab3 = st.tabs(
@@ -138,13 +140,6 @@ def main():
         st.error('Username/password is incorrect')
     elif authentication_status == None:
         st.warning('Please enter your username and password')
-
-    # Optional: Add register and forgot password buttons
-    if st.sidebar.button('Register'):
-        authenticator.register_user('Register user', preauthorization=False)
-
-    if st.sidebar.button('Forgot password'):
-        authenticator.forgot_password('Reset password')
 
 
 if __name__ == "__main__":
