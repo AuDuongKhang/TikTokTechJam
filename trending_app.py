@@ -59,7 +59,7 @@ def register_new_user(config):
                 'email': email,
             }
 
-            with open('./config.yaml', 'w') as file:
+            with open(config_default_link, 'w') as file:
                 yaml.dump(config, file, default_flow_style=False)
 
             st.success('User registered successfully!')
