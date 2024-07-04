@@ -4,12 +4,32 @@ cookie:
   name: TikTokTechJam-CLOCK
 credentials:
   usernames:
+    haha:
+      email: haha@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: haha
+      password: $2b$12$6o6G.COVsHcUg3zyOzV.5O8HPmlqPJBfretRNi4Xt/Skqo67lwdzK
+    khang:
+      email: khang@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: khang
+      password: $2b$12$cuy0tXrdlGHscl1zOoVy1.gWKnC3FGFdFKfU4qq2kOAZfz/c/GtxC
+    khang1:
+      email: khang@gmail.com
+      name: khang
+      password: $2b$12$keMLrAW19gO2lT62IEWODOf1TEoLRut4gxaVjbCSJaGFIUbdBLveC
     user1:
       email: tiktok@techjam.com
+      failed_login_attempts: 0
+      logged_in: false
       name: TikTokTechJam
       password: $2b$12$3Bx5uNPnBSi./vZ8J0jbEuonjjRMp4C.p/ORoOUayhG1LnAUx3xT6
     user2:
       email: clock@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
       name: CLOCK
       password: $2b$12$NRhrWzbnibvupZ9qRWQIUO4gHJCU.R.dGyxfV71Koo0L2RDeiVYl6
 preauthorized:
