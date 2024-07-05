@@ -4,6 +4,8 @@ import yaml
 import time
 from yaml.loader import SafeLoader
 from text_to_sound import gen
+from video_pose_prompt import process_video_pose
+import os
 
 def main():
     with open('./config.yaml') as file:
@@ -95,33 +97,53 @@ def main():
                             st.experimental_rerun()
 
         with tab2:
-            st.header("Create Video by Motion")
+                st.header("Create Video by Motion")
 
-            if 'motion_video' not in st.session_state:
-                motion_text = st.text_area(
-                    "Enter text to generate motion video", "")
-                motion_video = st.file_uploader(
-                    "Upload video for motion", type=["mp4", "mov", "avi"])
-                if st.button("Generate Motion Video"):
-                    st.session_state['motion_video'] = "Generated motion video from: " + motion_text
-                    st.experimental_rerun()
+                if 'motion_video' not in st.session_state:
+                    motion_text = st.text_area("Enter text to generate motion video", "")
+                    motion_video = st.file_uploader("Upload video for motion", type=["mp4", "mov", "avi"])
+                    if motion_video is not None:
+                        st.video(motion_video)  # Display the uploaded video
+                        if st.button("Generate Motion Video"):
+                            os.chdir('./FollowYourPose')
+                            print(os.getcwd())
 
-            if 'motion_video' in st.session_state:
-                st.write(st.session_state['motion_video'])
+                            # Save the uploaded video to a temporary file
+                            with open("temp_motion_video.mp4", "wb") as f:
+                                f.write(motion_video.getbuffer())
+                            
+                            # Process the video and prompt
+                            process_video_pose(motion_text, "temp_motion_video.mp4")
+                            
+                            st.session_state['motion_video'] = "Generated motion video from: " + motion_text
+                            st.session_state['generated_video_path'] = "temp_motion_video.mp4"  # Path to the generated video
+                            st.experimental_rerun()
+                            os.chdir('..')
+                            print(os.getcwd())
+                    else:
+                        st.error("Please upload a video for motion.")
 
-                if 'motion_audio_video' not in st.session_state:
-                    if st.button("Add Audio to Motion Video"):
-                        st.session_state['motion_audio_video'] = "Generated motion video with audio"
-                        st.experimental_rerun()
-                    if st.button("Back to Motion Video Generation"):
-                        del st.session_state['motion_video']
-                        st.experimental_rerun()
+                if 'motion_video' in st.session_state:
+                    st.write(st.session_state['motion_video'])
 
-                if 'motion_audio_video' in st.session_state:
-                    st.write(st.session_state['motion_audio_video'])
-                    if st.button("Back to Motion Video Generation"):
-                        del st.session_state['motion_audio_video']
-                        st.experimental_rerun()
+                    # Display the generated video
+                    if 'generated_video_path' in st.session_state:
+                        st.video(st.session_state['generated_video_path'])
+
+                    if 'motion_audio_video' not in st.session_state:
+                        if st.button("Add Audio to Motion Video"):
+                            st.session_state['motion_audio_video'] = "Generated motion video with audio"
+                            st.experimental_rerun()
+                        if st.button("Back to Motion Video Generation"):
+                            del st.session_state['motion_video']
+                            del st.session_state['generated_video_path']
+                            st.experimental_rerun()
+
+                    if 'motion_audio_video' in st.session_state:
+                        st.write(st.session_state['motion_audio_video'])
+                        if st.button("Back to Motion Video Generation"):
+                            del st.session_state['motion_audio_video']
+                            st.experimental_rerun()
 
         with tab3:
             st.header("Generate Script")
