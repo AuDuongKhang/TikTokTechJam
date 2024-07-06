@@ -244,7 +244,6 @@ def main():
 
             with tab3:
                 st.header("Generate Script")
-                st.markdown(script_process(st.session_state['script']))
 
                 if 'script' not in st.session_state:
                     script_text_2 = st.text_area(
@@ -257,6 +256,7 @@ def main():
 
                 if 'script' in st.session_state:
                     st.write(st.session_state['script'])
+                    st.markdown(script_process(st.session_state['script']))
                     if st.button("Back to Script Generation"):
                         del st.session_state['script']
                         st.experimental_rerun()
