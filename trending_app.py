@@ -74,7 +74,7 @@ def register_new_user(config):
 
 
 def main():
-    with open('./config.yaml') as file:
+    with open(config_default_link) as file:
         config = yaml.load(file, Loader=SafeLoader)
 
     # Initialize authenticator
@@ -86,53 +86,49 @@ def main():
         config['preauthorized']
     )
 
-    # Create a login widget
-    name, authentication_status, username = authenticator.login()
+    if 'register' not in st.session_state:
+        st.session_state['register'] = False
 
-    if authentication_status:
-        authenticator.logout()
+    if st.session_state['register']:
+        st.sidebar.title("Register User")
+        register_new_user(config)
 
-        st.title("TikTokTechJam-CLOCK")
+        if st.sidebar.button("Back to Login"):
+            st.session_state['register'] = False
+            st.experimental_rerun()
+    else:
+        # Create a login widget
+        name, authentication_status, username = authenticator.login()
 
-        tab1, tab2, tab3 = st.tabs(
-            ["Create Content/Video/Audio", "Create Video by Motion", "Create Script"])
+        if authentication_status:
+            st.sidebar.success("You are logged in")
+            authenticator.logout("Logout", "sidebar")
 
-        with tab1:
-            st.header("Create Content, Video, and Audio")
+            st.title("TikTokTechJam-CLOCK")
 
-            if 'content' not in st.session_state:
-                content_text = st.text_area(
-                    "Enter text to generate content", key='generate content')
+            tab1, tab2, tab3 = st.tabs(
+                ["Create Content/Video/Audio", "Create Video by Motion", "Create Script"])
 
-                if st.button("Generate Content"):
-                    st.session_state['content'] = "Generated content from: " + content_text
-                    st.experimental_rerun()
+            with tab1:
+                st.header("Create Content, Video, and Audio")
 
                 if 'content' not in st.session_state:
                     content_text = st.text_area(
                         "Enter text to generate content", key='generate content')
 
-                if 'video' not in st.session_state and 'audio' not in st.session_state:
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        if st.button("Back to Content Generation"):
-                            del st.session_state['content']
-                            st.experimental_rerun()
+                    if st.button("Generate Content"):
+                        st.session_state['content'] = "Generated content from: " + content_text
+                        st.experimental_rerun()
 
-                    with col2:
-                        st.subheader("Convert Content to Video")
-                        prompt = st.text_input(
-                            "Enter prompt for video generation", key='video_prompt')
-                        negative_prompt = st.text_input(
-                            "Enter negative prompt", key='negative_prompt')
-                        video_duration = st.number_input(
-                            "Enter video duration (seconds)", min_value=1, max_value=60, value=7)
+                if 'content' in st.session_state:
+                    st.write(st.session_state['content'])
 
-                        if st.button("Generate Video"):
-                            video_path = vg.generate_video(
-                                prompt, negative_prompt, video_duration)
-                            st.session_state['video'] = video_path
-                            st.experimental_rerun()
+                    if 'video' not in st.session_state and 'audio' not in st.session_state:
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            if st.button("Back to Content Generation"):
+                                del st.session_state['content']
+                                st.experimental_rerun()
 
                         with col2:
                             st.subheader("Convert Content to Video")
@@ -149,12 +145,10 @@ def main():
                                 st.session_state['video'] = video_path
                                 st.experimental_rerun()
 
-                if 'video' in st.session_state:
-                    st.write("Generated video from content:")
-                    video_anime = vg.display_video(st.session_state['video'])
-                    st.write(video_anime.to_html5_video(),
-                             unsafe_allow_html=True)
-                    col1, col2 = st.columns(2)
+                        with col3:
+                            if st.button("Convert Content to Audio"):
+                                st.session_state['audio'] = "Generated audio from content: "
+                                st.experimental_rerun()
 
                     if 'video' in st.session_state:
                         st.write("Generated video from content:")
@@ -164,18 +158,16 @@ def main():
                                  unsafe_allow_html=True)
                         col1, col2 = st.columns(2)
 
-                    with col2:
-                        if st.button("Back to Video or Audio Generation"):
-                            del st.session_state['video']
-                            st.experimental_rerun()
+                        with col1:
+                            if st.button("Back to Content Generation"):
+                                del st.session_state['content']
+                                del st.session_state['video']
+                                st.experimental_rerun()
 
-                if 'audio' in st.session_state:
-                    st.write(st.session_state['audio'])
-                    audio_file_path = 'out.wav'
-                    prompt = st.session_state['content'].split(':')[1].strip()
-                    gen(audio_file_path, prompt)
-                    st.audio(audio_file_path, format='audio/wav')
-                    col1, col2 = st.columns(2)
+                        with col2:
+                            if st.button("Back to Video or Audio Generation"):
+                                del st.session_state['video']
+                                st.experimental_rerun()
 
                     if 'audio' in st.session_state:
                         st.write(st.session_state['audio'])
@@ -186,12 +178,18 @@ def main():
                         st.audio(audio_file_path, format='audio/wav')
                         col1, col2 = st.columns(2)
 
-                    with col2:
-                        if st.button("Back to Video or Audio Generation"):
-                            del st.session_state['audio']
-                            st.experimental_rerun()
+                        with col1:
+                            if st.button("Back to Content Generation"):
+                                del st.session_state['content']
+                                del st.session_state['audio']
+                                st.experimental_rerun()
 
-        with tab2:
+                        with col2:
+                            if st.button("Back to Video or Audio Generation"):
+                                del st.session_state['audio']
+                                st.experimental_rerun()
+
+            with tab2:
                 st.header("Create Video by Motion")
 
                 if 'motion_video' not in st.session_state:
@@ -252,21 +250,27 @@ def main():
                     script_text_2 = st.text_area(
                         "Enter text to generate script", key='generate script')
 
-                if st.button("Generate Script"):
-                    st.session_state['script'] = "Generated script from: " + \
-                        script_text_2
-                    st.experimental_rerun()
+                    if st.button("Generate Script"):
+                        st.session_state['script'] = "Generated script from: " + \
+                            script_text_2
+                        st.experimental_rerun()
 
-            if 'script' in st.session_state:
-                st.write(st.session_state['script'])
-                if st.button("Back to Script Generation"):
-                    del st.session_state['script']
-                    st.experimental_rerun()
+                if 'script' in st.session_state:
+                    st.write(st.session_state['script'])
+                    if st.button("Back to Script Generation"):
+                        del st.session_state['script']
+                        st.experimental_rerun()
 
-    elif authentication_status == False:
-        st.error('Username/password is incorrect')
-    elif authentication_status == None:
-        st.warning('Please enter your username and password')
+        elif authentication_status == False:
+            st.error('Username/password is incorrect')
+            st.session_state['register'] = False
+        elif authentication_status == None:
+            st.warning('Please enter your username and password')
+            st.session_state['register'] = False
+
+        if st.sidebar.button("Register", key='register_new_user'):
+            st.session_state['register'] = True
+            st.experimental_rerun()
 
 
 if __name__ == "__main__":
