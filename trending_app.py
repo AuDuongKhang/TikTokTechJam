@@ -172,6 +172,11 @@ def main():
 
                     if 'audio' in st.session_state:
                         st.write(st.session_state['audio'])
+                        audio_file_path = 'out.wav'
+                        prompt = st.session_state['content'].split(':')[
+                            1].strip()
+                        gen(audio_file_path, prompt)
+                        st.audio(audio_file_path, format='audio/wav')
                         col1, col2 = st.columns(2)
 
                         with col1:
