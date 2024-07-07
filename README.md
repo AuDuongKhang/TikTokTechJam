@@ -46,4 +46,4 @@ Our project is **CreativeAide**. Our product will create any video with accompan
    
 ## Demo Video
 
-Watch our [demo video]([https://dfsd.com](https://youtu.be/USsZ90nLvO4)) to see CreativeAide in action.
+Watch our demo video at https://youtu.be/USsZ90nLvO4 to see CreativeAide in action.
