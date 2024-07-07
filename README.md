@@ -25,6 +25,10 @@ Our project is **CreativeAide**. Our product will create any video with accompan
 
 ## How to Run the Code
 
+### Public Account
+- **Username:** user1
+- **Password:** 12345
+  
 ### Step 1: Set up the Environment
 1. Open and execute each cell in the `set_up_environment.ipynb` file to load the model and necessary libraries.
 
